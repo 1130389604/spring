@@ -179,7 +179,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		return this.beanNameGenerator;
 	}
 
-
+	/**
+	 * 根据多个资源文件加载bean
+	 */
 	@Override
 	public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
 		Assert.notNull(resources, "Resource array must not be null");
@@ -191,12 +193,15 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 	@Override
+	/**
+	 * 根据单个资源配置路径加载资源文件
+	 */
 	public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(location, null);
 	}
 
 	/**
-	 * Load bean definitions from the specified resource location.
+	 * 从指定的资源位置加载bean定义
 	 * <p>The location can also be a location pattern, provided that the
 	 * ResourceLoader of this bean definition reader is a ResourcePatternResolver.
 	 * @param location the resource location, to be loaded with the ResourceLoader
@@ -211,6 +216,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
+		//获取resourceLodar
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {
 			throw new BeanDefinitionStoreException(
@@ -218,10 +224,12 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		}
 
 		if (resourceLoader instanceof ResourcePatternResolver) {
-			// Resource pattern matching available.
+			// 匹配可用的资源模式
 			try {
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+				//根据资源文件加载bean
 				int count = loadBeanDefinitions(resources);
+				//添加实际的资源
 				if (actualResources != null) {
 					Collections.addAll(actualResources, resources);
 				}
@@ -236,9 +244,10 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 			}
 		}
 		else {
-			// Can only load single resources by absolute URL.
+			// 只能通过绝对URL加载单个资源.
 			Resource resource = resourceLoader.getResource(location);
 			int count = loadBeanDefinitions(resource);
+			//添加实际的资源
 			if (actualResources != null) {
 				actualResources.add(resource);
 			}
@@ -249,6 +258,12 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		}
 	}
 
+	/**
+	 * 根据多个资源配置路径加载资源文件
+	 * @param locations
+	 * @return 返回资源配置文件数量
+	 * @throws BeanDefinitionStoreException
+	 */
 	@Override
 	public int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException {
 		Assert.notNull(locations, "Location array must not be null");
